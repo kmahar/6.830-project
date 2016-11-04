@@ -12,8 +12,12 @@ access_token_secret = 'TOqP6kauz7RqnhfmVT2QiEyOLsyO0WTNHkRNfSMqLIOWo'
 
 
 start_time = time.time() #grabs the system time
-keyword_list = ['bernie', 'sanders', 'clinton', 'trump'] #track list, or what words we're looking for
 
+def load_keywords(filename):
+	f = open(filename, 'r')
+	terms = [keyword.strip() for keyword in list(f)]
+	f.close()
+	return terms
 
 #Listener Class Override
 class listener(StreamListener):
@@ -60,4 +64,4 @@ auth.set_access_token(access_token_key, access_token_secret)
 twitterStream = Stream(auth, listener(start_time, time_limit=20)) #initialize Stream object with a time out limit
 
 #first four numbers = US, second four numbers = Alaska, last four numbers = Hawaii (southwest first, then northeast)
-twitterStream.filter(track=keyword_list, languages=['en'], locations=[-126.185404, 25.447902, -61.538415, 49.844730, -167.797322, 52.300594, -140.596922, 72.202104, -160.799852, 18.225603, -154.800269, 22.239597])  #call the filter method to run the Stream Object
+twitterStream.filter(track=load_keywords('keywords.txt'), languages=['en'], locations=[-126.185404, 25.447902, -61.538415, 49.844730, -167.797322, 52.300594, -140.596922, 72.202104, -160.799852, 18.225603, -154.800269, 22.239597])  #call the filter method to run the Stream Object
