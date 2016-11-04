@@ -55,7 +55,7 @@ class listener(StreamListener):
  
 	def on_error(self, status):
  
-		print statuses
+		print status
 
 auth = OAuthHandler(ckey, consumer_secret) #OAuth object
 auth.set_access_token(access_token_key, access_token_secret)
