@@ -35,9 +35,9 @@ def calc_avg_time():
 
     process_window(avg_time, window)
 
-calc_avg_time()
-
-
+#Similar to previous function, but now using vaderSentiment
+#**Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text. Eighth International Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.** 
+#Admittedly, the general sentiment over a lot of tweets isn't THAT useful
 def calc_avg_sentiment():
     running_count = 0
     avg_sentiment = 0
@@ -66,11 +66,17 @@ def calc_avg_sentiment():
 
     process_window(avg_sentiment, window)
 
+def calc_avg_sentiment_by_hashtag():
+    return
+
+
+
 print "CALCULATE AVG TIME"
 calc_avg_time()
-
 print 
-print "calc_avg_sentiment"
+
+print "CALCULATE AVG SENTIMENT"
 calc_avg_sentiment()
+print
 
 
