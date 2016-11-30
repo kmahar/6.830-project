@@ -47,5 +47,4 @@ class listener(StreamListener):
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 twitterStream = Stream(auth, listener())
-#What you want to search for here
-twitterStream.filter(track=["Halloween"])
+twitterStream.filter(track=load_keywords('keywords.txt'))
