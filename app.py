@@ -1,9 +1,21 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+
 app = Flask(__name__)
 
-@app.route("/")
-def hello():
-	return render_template("index.html")
+HASHTAG = 'test'
 
+@app.route('/')
+def index():
+	return render_template('index.html')
+
+@app.route('/set_hashtag', methods=['POST'])
+def set_hashtag():
+	if 'hashtag' not in request.form:
+		return 'Missing hashtag parameter', 400
+
+	tag = request.form['hashtag']
+	HASHTAG = tag
+	return "Ok"
+		
 if __name__ == "__main__":
 	app.run()
