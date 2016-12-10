@@ -8,17 +8,20 @@ for line in r.iter_lines():
 	meetup_dict = json.loads(line)
 
 	try: 
+		if meetup_dict['group']['country'] != 'us' or meetup_dict['venue']['country'] != 'us':
+			continue
+
 		meetup_new = {
-			'event_url' : meetup_dict['event_url'],
-			'group_name' : meetup_dict['group']['name'],
-			'group_lat' : meetup_dict['group']['group_lat'],
-			'group_lon' : meetup_dict['group']['group_lon'],
-			'event_name' : meetup_dict['name'],
-			'event_time' : meetup_dict['time'],
-			'venue_lat' : meetup_dict['venue']['lat'],
-			'venue_lon' : meetup_dict['venue']['lon'],
-			'created_time' : datetime.fromtimestamp( meetup_dict['mtime'] / 1000.0),
-			'id' : meetup_dict['id']
+			'meetup_event_url' : meetup_dict['event_url'],
+			'meetup_group_name' : meetup_dict['group']['name'],
+			'meetup_group_lat' : meetup_dict['group']['group_lat'],
+			'meetup_group_lon' : meetup_dict['group']['group_lon'],
+			'meetup_event_name' : meetup_dict['name'],
+			'meetup_event_time' : meetup_dict['time'],
+			'meetup_venue_lat' : meetup_dict['venue']['lat'],
+			'meetup_venue_lon' : meetup_dict['venue']['lon'],
+			'meetup_created_time' : datetime.fromtimestamp( meetup_dict['mtime'] / 1000.0),
+			'meetup_id' : meetup_dict['id']
 		}
 
 	except KeyError:
