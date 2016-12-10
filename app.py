@@ -8,6 +8,10 @@ HASHTAG = 'test'
 def index():
 	return render_template('index.html')
 
+@app.route('/index_2')
+def test():
+	return render_template('index_2.html')
+
 @app.route('/set_hashtag', methods=['POST'])
 def set_hashtag():
 	if 'hashtag' not in request.form:
