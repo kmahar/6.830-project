@@ -1,24 +1,24 @@
-from multiprocessing import Process, Queue
-from Queue import Empty
-
 import time
+import os
+import io
+import json
+import requests
+
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
-import os
-import io
-from datetime import datetime
-import json
-
-import requests
+import datetime
+from multiprocessing import Process, Queue
+from Queue import Empty
+from stream_joiner import TweetStreamStore, MeetupStreamStore, StreamJoiner
 
 #pretty much twitterPull.py
 #should be externally called, but that was taking me too long to figure out
 def streamTweetFile(stream_queue):   
-    ckey = ''
-    consumer_secret = ''
-    access_token_key = ''
-    access_token_secret = ''
+    ckey = '20bJqDsVLb649kmKBo0k28Dbe'
+    consumer_secret = 'aTBU47uIvTL5lyNsfQhD7obkM9XozcDqyyS1WzsXFgKz8TV0be'
+    access_token_key = '793668268540190720-o101NRo2TYknol7qJA6BhHSyXAVadH3'
+    access_token_secret = 'TOqP6kauz7RqnhfmVT2QiEyOLsyO0WTNHkRNfSMqLIOWo'
 
     start_time = time.time() #grabs the system time
 
@@ -32,7 +32,6 @@ def streamTweetFile(stream_queue):
     class listener(StreamListener):
      
         def __init__(self, start_time, time_limit=60):
-     
             self.time = start_time
             self.limit = time_limit
      
@@ -44,7 +43,7 @@ def streamTweetFile(stream_queue):
 
                 try: 
                     new_data = {
-                        'tweet_created_time' : datetime.fromtimestamp( int(data['timestamp_ms']) / 1000.0),
+                        'tweet_created_time' : datetime.datetime.fromtimestamp( int(data['timestamp_ms']) / 1000.0),
                         'tweet_text' : data['text'],
                         'tweet_username' : data['user']['screen_name'],
                         'tweet_bounding_box_coords' : data['place']['bounding_box']['coordinates'][0]
@@ -53,14 +52,13 @@ def streamTweetFile(stream_queue):
 
                 except KeyError:
                     pass
+                except TypeError:
+                    pass
             else: 
                 return False
-
-        # def write_data(self):
-        #     self.saveFile.write(','.join(self.tweet_data))
      
         def on_error(self, status):
-            print status
+            print "Error: status code", status
 
     auth = OAuthHandler(ckey, consumer_secret) #OAuth object
     auth.set_access_token(access_token_key, access_token_secret)
@@ -91,20 +89,30 @@ def streamMeetupFile(stream_queue):
                 'meetup_event_time' : meetup_dict['time'],
                 'meetup_venue_lat' : meetup_dict['venue']['lat'],
                 'meetup_venue_lon' : meetup_dict['venue']['lon'],
-                'meetup_created_time' : datetime.fromtimestamp( meetup_dict['mtime'] / 1000.0),
+                'meetup_created_time' : datetime.datetime.fromtimestamp( meetup_dict['mtime'] / 1000.0),
                 'meetup_id' : meetup_dict['id']
             }
+
+            stream_queue.put(meetup_new)
 
         except KeyError:
             continue
 
-        stream_queue.put(meetup_new)
-
-
-
 if __name__ == "__main__":
     stream1 = Queue()
     stream2 = Queue()
+
+    grid_width = 10
+    grid_height = 10
+    window_length = datetime.timedelta(minutes=1)
+    join_tolerance = 5
+
+    tweets = TweetStreamStore(grid_width, grid_height, window_length, join_tolerance)
+    meetups = MeetupStreamStore(grid_width, grid_height, window_length, join_tolerance)
+
+    joiner = StreamJoiner(tweets, meetups)
+
+    output_queue = joiner.get_output_queue()
 
     p1 = Process(target=streamTweetFile, args=(stream1,))
     p1.start()
@@ -112,10 +120,34 @@ if __name__ == "__main__":
     p2.start()
 
     while True:
-        print
-        print "Size of stream 1:"
-        print stream1.get()
-        print "size of stream 2:"
-        print stream2.get()
-        print 
-        time.sleep(1)
+        try:
+            res = stream1.get_nowait()
+            joiner.add_item(1, res)
+        except Empty:
+            pass
+        try:
+            res = stream2.get_nowait()
+            joiner.add_item(2, res)
+        except Empty:
+            pass
+
+
+        try:
+            res = output_queue.get_nowait()
+            print res
+        except Empty:
+            pass
+
+        # print "tweets size:", tweets.get_size()
+        # print "meetups size:", meetups.get_size()
+        # if meetups.get_size() > 10:
+        #     break
+
+
+    # for cell in tweets.cells:
+    #     length = len(tweets.cells[cell])
+    #     if length > 0:
+    #         print "cell %s: %s tweets" % (cell, length)
+        #time.sleep(1)
+
+
