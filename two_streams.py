@@ -8,13 +8,15 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import datetime
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Value
 from Queue import Empty
 from stream_joiner import TweetStreamStore, MeetupStreamStore, StreamJoiner
 
+TWEETS_ADDED = 0
+
 #pretty much twitterPull.py
 #should be externally called, but that was taking me too long to figure out
-def streamTweetFile(stream_queue):   
+def streamTweetFile(stream_queue, counter):   
     ckey = '20bJqDsVLb649kmKBo0k28Dbe'
     consumer_secret = 'aTBU47uIvTL5lyNsfQhD7obkM9XozcDqyyS1WzsXFgKz8TV0be'
     access_token_key = '793668268540190720-o101NRo2TYknol7qJA6BhHSyXAVadH3'
@@ -48,6 +50,10 @@ def streamTweetFile(stream_queue):
                         'tweet_username' : data['user']['screen_name'],
                         'tweet_bounding_box_coords' : data['place']['bounding_box']['coordinates'][0]
                     }
+                    
+                    with counter.get_lock():
+                        counter.value += 1
+
                     stream_queue.put(new_data)
 
                 except KeyError:
@@ -66,7 +72,7 @@ def streamTweetFile(stream_queue):
     twitterStream = Stream(auth, listener(start_time, time_limit = 60*60*36)) #initialize Stream object with a time out limit
     #first four numbers = US, second four numbers = Alaska, last four numbers = Hawaii (southwest first, then northeast)
     #call the filter method to run the Stream Object
-    twitterStream.filter(languages=['en'], locations=[-126.185404, 25.447902, -61.538415, 49.844730, -167.797322, 52.300594, -140.596922, 72.202104, -160.799852, 18.225603, -154.800269, 22.239597])
+    twitterStream.filter(languages=['en'], locations=[-124.0, 25.0, -67.0, 50.0])
 
 #pretty much meetup_stream.py
 #should be externally called, but that was taking me too long to figure out
@@ -114,40 +120,41 @@ if __name__ == "__main__":
 
     output_queue = joiner.get_output_queue()
 
-    p1 = Process(target=streamTweetFile, args=(stream1,))
+    tweets_added_to_stream = Value('i', 0)
+
+    p1 = Process(target=streamTweetFile, args=(stream1,tweets_added_to_stream))
     p1.start()
     p2 = Process(target=streamMeetupFile, args=(stream2,))
     p2.start()
+
+    tweets_added_to_joiner = 0
 
     while True:
         try:
             res = stream1.get_nowait()
             joiner.add_item(1, res)
+            tweets_added_to_joiner += 1
         except Empty:
             pass
+
+
         try:
             res = stream2.get_nowait()
             joiner.add_item(2, res)
         except Empty:
             pass
 
-
         try:
             res = output_queue.get_nowait()
-            print res
+            #print res
+            print "join"
         except Empty:
             pass
 
+        print "tweets added to joiner:", tweets_added_to_joiner
+        print "tweets added to stream:", tweets_added_to_stream.value
         # print "tweets size:", tweets.get_size()
         # print "meetups size:", meetups.get_size()
         # if meetups.get_size() > 10:
         #     break
-
-
-    # for cell in tweets.cells:
-    #     length = len(tweets.cells[cell])
-    #     if length > 0:
-    #         print "cell %s: %s tweets" % (cell, length)
-        #time.sleep(1)
-
 
