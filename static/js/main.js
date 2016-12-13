@@ -171,7 +171,9 @@ function drawMonth(m,tween){
     });
   }
 
-  d3.select("#date p#month").html( monthLabel(m) );
+  // d3.select("#date p#month").html( monthLabel(m) );
+  var time = new Date();
+  d3.select("#date p#month").html( time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds() );
 
   if (hoverData){
     setProbeContent(hoverData);

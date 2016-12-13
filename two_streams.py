@@ -130,24 +130,20 @@ if __name__ == "__main__":
             joiner.add_item(2, res)
         except Empty:
             pass
-
-
         try:
+            
             res = output_queue.get_nowait()
             print res
         except Empty:
             pass
-
+        
         # print "tweets size:", tweets.get_size()
         # print "meetups size:", meetups.get_size()
         # if meetups.get_size() > 10:
         #     break
-
 
     # for cell in tweets.cells:
     #     length = len(tweets.cells[cell])
     #     if length > 0:
     #         print "cell %s: %s tweets" % (cell, length)
         #time.sleep(1)
-
-
