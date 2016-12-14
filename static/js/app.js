@@ -167,6 +167,9 @@
 		var city = data.place.full_name;
 		userInfo.city = city;
 		userInfo.state = city.substring(city.lastIndexOf(',')+1).trim();
+		console.log(city);
+		console.log(userInfo.city);
+		console.log(userInfo.state);
 
 		userInfo.name = data.user.name;
 		userInfo.screenname = data.user.screen_name;
@@ -198,10 +201,12 @@
 			document.querySelector('.screenname').textContent = '@' + user.screenname;
 			document.querySelector('.text').innerHTML = twemoji.parse(insertLinks(user.tweet));
 			document.querySelector('.timestamp').textContent = user.timestamp;
+			document.querySelector('.meetup').style.backgroundImage = 'url(static/images/meetup_script_logo.svg)';
+			document.querySelector('.location').textContent = user.city;
 
-			// document.querySelector('.reply').href ='https://twitter.com/intent/tweet?in_reply_to=' + user.id_str;
-			// document.querySelector('.retweet').href = 'https://twitter.com/intent/retweet?tweet_id=' + user.id_str;
-			// document.querySelector('.favorite').href = 'https://twitter.com/intent/favorite?tweet_id=' + user.id_str;
+			document.querySelector('.reply').href ='https://twitter.com/intent/tweet?in_reply_to=' + user.id_str;
+			document.querySelector('.retweet').href = 'https://twitter.com/intent/retweet?tweet_id=' + user.id_str;
+			document.querySelector('.favorite').href = 'https://twitter.com/intent/favorite?tweet_id=' + user.id_str;
 			
 			document.querySelector('.tweet').style.opacity = 0.9;
 
@@ -228,11 +233,15 @@
 			// 	.attr('width', '26').attr('height', '26')
    //         		.attr('transform', function(d) {return 'translate(' + position + ')';});
 
+   			translatedPostionX = position.x - 28;
+   			translatedPostionY = position.y - 28;
+
        		faceIcon.enter()
 				.append('svg:image')
 				.attr('xlink:href', 'static/images/meetup_logo.png')
 				.attr('width', '28').attr('height', '28')
-           		.attr('transform', function(d) {return 'translate(' + position + ')';});
+				.attr('transform', function(d) {return 'translate(' + position + ')';});
+           		// .attr('transform', function(d) {return 'translate(' + translatedPostionX + ',' + translatedPostionY + ')';});
 		});
 	}
 

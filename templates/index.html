@@ -13,18 +13,22 @@
 		<p>Fuzzy-joining and processing of streaming data: a system to join Twitter tweets with Meetup meetings based on location
 		</p>
 	</header>
-	<section id="main" style="height:450px">
+	<section id="main" style="position:relative;top:15px;">
 		<section id="map" class="map"></section>
 		<section class="tweet">
 			<blockquote class="h-entry">
-				<a class="button" role="button" title="Follow on Twitter" href="" target="_blank"><img src="static/images/twitter-button.png"></a>
+				<a class="button" role="button" title="Follow on Twitter" href="" target="_blank" style="display:none;""><img src="static/images/twitter-button.png"></a>
 				<div class="header">
 					<div class="name"></div>
 					<div class="screenname"></div>
 				</div>
 				<div class="text"></div>
 				<div class="timestamp"></div>
-				<div class="actions">
+				<div class="meetup">
+					<img src="static/images/meetup_script_logo.svg" style="height:30px;position:relative;top:10px;">
+					<span> in </span><span class="location"></span>
+				</div>
+				<div class="actions" style="display:none;">
 					<a class="reply" href="" target="_blank"><i class="fa fa-reply"></i></a>
 					<a class="retweet" href="" target="_blank"><i class="fa fa-retweet"></i></a>
 					<a class="favorite" href="" target="_blank"><i class="fa fa-star"></i></a>
@@ -32,16 +36,9 @@
 			</blockquote>
 			<div class="emotion"></div>
 		</section>
-		<section class="legendbox" style="text-align:center;">
-			<ul>
-				<li><div class="happy"></div>More positive tweets</li>
-				<li><div class="neutral"></div>Equal numbers of positive and negative tweets</li>
-				<li><div class="sad"></div>More negative tweets</li>
-			</ul>
-		</section>
 	</section>
 	<input type="button" id="toggle" value="Stop me!" style="display:none;">
-	<footer class="footer" style="text-align:center;position:relative;top:50px;"><p>&copy; 2016 Michael Belland, Kaitlin Mahar, Marie Shi Feng</p></footer>
+	<footer class="footer" style="text-align:center;"><p>&copy; 2016 Michael Belland, Kaitlin Mahar, Marie Shi Feng</p></footer>
 	<script src="http://cdn.pubnub.com/pubnub-3.16.4.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>

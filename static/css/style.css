@@ -72,9 +72,9 @@ footer .logo {
 }
 .tweet {
 	position: absolute;
-	width: 290px;
-	min-height: 240px;
-	padding: 16px;
+	width: 300px;
+/*	min-height: 240px;
+*/	padding: 16px;
 	background: #fff;
 	border-radius: 10px;
 	top: 30px;
@@ -143,7 +143,7 @@ footer .logo {
 }
 .emotion {
   	position: absolute;
-  	bottom: -60px;
+  	bottom: -65px;
   	left: 50px;
   	border: 0;
   	width: 72px;
@@ -156,11 +156,6 @@ footer .logo {
 ul {
 	padding: 0;
 }
-
-/*.legendbox {
-	position: relative;
-	top: -90px;
-}*/
 .legendbox li {
 	list-style-type: none;
 	display: inline-block;
