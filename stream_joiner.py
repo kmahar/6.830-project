@@ -2,7 +2,7 @@ import Queue
 import collections
 import datetime
 import math
-from geopy.distance import vincenty 
+from geopy.distance import vincenty, great_circle
 
 class StreamJoiner(object):
 
@@ -12,7 +12,7 @@ class StreamJoiner(object):
 	def __init__(self, stream_1, stream_2):
 		self.stream_1 = stream_1
 		self.stream_2 = stream_2 
-		self.output_queue = Queue.Queue() # this is synchronized!
+		self.output_queue = Queue.Queue() 
 
 	'''
 	input: stream_number - index corresponding to which stream 
@@ -71,10 +71,12 @@ class GridStreamStore(object):
 		joins = []		
 		x, y = self.other_hash(other_stream_item)
 
-		surrounding = [(x-1, y-1), (x-1, y), (x-1, y+1), 
-						(x, y-1), (x, y), (x, y+1), 
-						(x+1, y-1), (x+1, y), (x+1, y+1)]	
-			
+		surrounding = [(x, y), (x, y+1), (x, y-1),
+						(x-1, y), (x-1, y+1), (x-1, y-1),
+						(x+1, y), (x+1, y+1), (x+1, y-1)]
+		
+		# #surrounding = self.get_cells_to_check(other_stream_item)
+
 		for s in surrounding:
 			s_x, s_y = s
 			if (s_x, s_y) in self.cells:
@@ -86,6 +88,55 @@ class GridStreamStore(object):
 						joins.append(self.join_items(c, other_stream_item))
 		
 		return joins
+
+	def get_cells_to_check(self, other_stream_item):
+
+		x, y = self.other_hash(other_stream_item)
+		to_check = [(x,y)]
+		lat, lon = self.other_loc(other_stream_item)
+		point = (lat, lon)
+
+		above = self.min_y + self.y_box_size * (y + 1)
+		below= self.min_y + self.y_box_size * y
+		left = self.min_x + self.x_box_size * x
+		right = self.min_x + self.x_box_size * (x + 1)
+
+		p1 = (above, lon)
+		p2 = (above, right)
+		p3 = (lat, right)
+		p4 = (below, right)
+		p5 = (below, lon)
+		p6 = (below, left)
+		p7 = (lat, left)
+		p8 = (above, left)
+
+		p1_close = self.close_enough(point, p1)
+		p2_close = self.close_enough(point, p2)
+		p3_close = self.close_enough(point, p3)
+		p4_close = self.close_enough(point, p4)
+		p5_close = self.close_enough(point, p5)
+		p6_close = self.close_enough(point, p6)
+		p7_close = self.close_enough(point, p7)
+		p8_close = self.close_enough(point, p8)
+
+		if p1_close:
+			to_check.append((x, y+1))
+		if p2_close:
+			to_check.append((x+1,y+1))
+		if p3_close:
+			to_check.append((x+1, y))
+		if p4_close:
+			to_check.append((x+1, y-1))
+		if p5_close:
+			to_check.append((x, y-1))
+		if p6_close: 
+			to_check.append((x-1, y-1))
+		if p7_close:
+			to_check.append((x-1, y))
+		if p8_close:
+			to_check.append((x-1, y+1))
+
+		return to_check	
 
 	def delete_expired(self, x, y):
 		if (x,y) not in self.cells:
@@ -129,7 +180,8 @@ class GridStreamStore(object):
 		return (avgLat, avgLon)
 
 	def close_enough(self, coords1, coords2):
-		dist = vincenty(coords1, coords2).miles
+		#dist = vincenty(coords1, coords2).miles
+		dist = great_circle(coords1, coords2).miles
 		return dist <= self.join_tolerance
 
 	#### to be implemented in child classes
@@ -168,6 +220,9 @@ class TweetStreamStore(GridStreamStore):
 		lat, lon = other_stream_item['meetup_venue_lat'], other_stream_item['meetup_venue_lon']
 		return self.hash_lat_lon(lat, lon)
 
+	def other_loc(self, i):
+		return i['meetup_venue_lat'], i['meetup_venue_lon']
+
 	# get the time from a tweet 
 	def get_time(self, item):
 		return item['tweet_created_time']
@@ -190,6 +245,9 @@ class MeetupStreamStore(GridStreamStore):
 	def other_hash(self, other_stream_item):
 		lat, lon = self.get_avg_location(other_stream_item)
 		return self.hash_lat_lon(lat, lon)
+
+	def other_loc(self, i):
+		return self.get_avg_location(i)
 
 	# get the time from a meetup
 	def get_time(self, item):

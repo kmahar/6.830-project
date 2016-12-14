@@ -3,6 +3,7 @@ import os
 import io
 import json
 import requests
+import cProfile
 
 from tweepy import Stream
 from tweepy import OAuthHandler
@@ -40,16 +41,7 @@ def reformat_meetup(meetup_dict):
         'meetup_id' : meetup_dict['id']
     }
 
-def load_data(filename, stream_queue, delay):
-    f = open(filename, 'r')
-    data = json.load(f)
-    f.close()
-    for d in data:
-        stream_queue.put(d)
-        time.sleep(delay)
-
-
-def streamTweets(stream_queue, counter):   
+def streamTweets(stream_queue):   
 
     start_time = time.time() #grabs the system time
 
@@ -67,8 +59,6 @@ def streamTweets(stream_queue, counter):
                 try: 
                     new_data = reformat_tweet(data)
                     stream_queue.put(new_data)
-                    with counter.get_lock():
-                        counter.value += 1
                 except (KeyError, TypeError):
                     pass
 
@@ -94,14 +84,15 @@ def streamMeetups(stream_queue):
                 meetup_new = reformat_meetup(meetup_dict)
                 stream_queue.put(meetup_new)
         except KeyError:
-            continue
+            pass
 
 if __name__ == "__main__":
+ 
     tweet_stream = Queue()
     meetup_stream = Queue()
 
-    grid_width = 10
-    grid_height = 10
+    grid_width = 500
+    grid_height = 350
     tweet_window_length = datetime.timedelta(minutes=1)
     meetup_window_length = datetime.timedelta(minutes=5)
     join_tolerance = 5 #in miles
@@ -113,26 +104,10 @@ if __name__ == "__main__":
     output_queue = joiner.get_output_queue()
 
     # for actually streaming tweets
-    # tweets_added_to_stream = Value('i', 0)
-    # p1 = Process(target=streamTweets, args=(tweet_stream,tweets_added_to_stream))
-    # p1.start()
-    # p2 = Process(target=streamMeetups, args=(meetup_stream,))
-    # p2.start()
-
-    # for baseline testing, just load tweets from file instead 
-    tweet_file = ''
-    meetup_file = ''
-
-    # if threads should sleep in between adding tweets to the queues 
-    tweet_delay = 0
-    meetup_delay = 0
-
-    p1 = Process(target=load_data, args=(tweet_file, tweet_stream, tweet_delay))
-    p2 = Process(target=load_data, args=(meetup_file, meetup_stream, meetup_delay))
+    p1 = Process(target=streamTweets, args=(tweet_stream,))
     p1.start()
+    p2 = Process(target=streamMeetups, args=(meetup_stream,))
     p2.start()
-
-    results = []
 
     while True:
         if not tweet_stream.empty():
@@ -145,8 +120,4 @@ if __name__ == "__main__":
 
         if not output_queue.empty():
             res = output_queue.get()
-            results.append(res)
-
-        print len(results)
-
-        # change here to break when results reaches certain length? 
+            print res
