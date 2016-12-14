@@ -1,31 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="../static/css/main.css" />
-    <link rel="stylesheet" href="../static/css/d3.slider.css" />
-    <title>Sentiments across Twitter and Meetup</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>6.830 Final Project</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
-    <div id="container">
-    <p></p><p></p><p></p>
-    <h1>Sentiments across Twitter and Meetup</h1>
-    <div id="date">
-        <p>Last five minutes ending at:</p>
-        <p id="month"></p>
-    </div>
-    <div id="play"></div>
-    <div id="slider-container">
-        <div id="slider-div"></div>
-        <div id="slider-probe">
-            <p></p>
-            <div></div>
-        </div>
-    </div>
-    <div id="map-container"></div>
-    </div>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-  <script src="../static/js/d3.slider.js"></script>
-  <script src="../static/js/main.js"></script>
+	<header id="title_header"  style="text-align:center;">
+		<h1>6.830 Final Project</h1>
+		<p>Fuzzy-joining and processing of streaming data: a system to join Twitter tweets with Meetup meetings based on location
+		</p>
+	</header>
+	<section id="main" style="height:450px">
+		<section id="map" class="map"></section>
+		<section class="tweet">
+			<blockquote class="h-entry">
+				<a class="button" role="button" title="Follow on Twitter" href="" target="_blank"><img src="static/images/twitter-button.png"></a>
+				<div class="header">
+					<div class="name"></div>
+					<div class="screenname"></div>
+				</div>
+				<div class="text"></div>
+				<div class="timestamp"></div>
+				<div class="actions">
+					<a class="reply" href="" target="_blank"><i class="fa fa-reply"></i></a>
+					<a class="retweet" href="" target="_blank"><i class="fa fa-retweet"></i></a>
+					<a class="favorite" href="" target="_blank"><i class="fa fa-star"></i></a>
+				</div>
+			</blockquote>
+			<div class="emotion"></div>
+		</section>
+		<section class="legendbox" style="text-align:center;">
+			<ul>
+				<li><div class="happy"></div>More positive tweets</li>
+				<li><div class="neutral"></div>Equal numbers of positive and negative tweets</li>
+				<li><div class="sad"></div>More negative tweets</li>
+			</ul>
+		</section>
+	</section>
+	<input type="button" id="toggle" value="Stop me!" style="display:none;">
+	<footer class="footer" style="text-align:center;position:relative;top:50px;"><p>&copy; 2016 Michael Belland, Kaitlin Mahar, Marie Shi Feng</p></footer>
+	<script src="http://cdn.pubnub.com/pubnub-3.16.4.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+	<script src="http://twemoji.maxcdn.com/twemoji.min.js"></script>
+	<script src="static/js/app.js"></script>
 </body>
 </html>
