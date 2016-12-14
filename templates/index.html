@@ -38,11 +38,28 @@
 		</section>
 	</section>
 	<input type="button" id="toggle" value="Stop me!" style="display:none;">
-	<footer class="footer" style="text-align:center;"><p>&copy; 2016 Michael Belland, Kaitlin Mahar, Marie Shi Feng</p></footer>
+	<section class="legendbox" style="text-align:center;">
+			<ul>
+				<li><div class="happy"></div>More positive tweets</li>
+				<li><div class="neutral"></div>Equal numbers of positive and negative tweets</li>
+				<li><div class="sad"></div>More negative tweets</li>
+			</ul>
+		</section>
+	</section>
+	<footer class="footer" style="text-align:center;position:relative;top:-20px;"><p>&copy; 2016 Michael Belland, Kaitlin Mahar, Marie Shi Feng</p></footer>
 	<script src="http://cdn.pubnub.com/pubnub-3.16.4.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 	<script src="http://twemoji.maxcdn.com/twemoji.min.js"></script>
 	<script src="static/js/app.js"></script>
+	<script>
+		$.ajax({
+  type: "POST",
+  url: "~/two_streams.py",
+  data: { param: text}
+}).done(function( o ) {
+   console.log("hello");
+});
+	</script>
 </body>
 </html>

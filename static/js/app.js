@@ -246,6 +246,12 @@
 	}
 
 	function processData(data) {
+
+
+		
+
+
+
 		if(!data || !data.place || !data.lang) return; 
 		if(data.place.country_code !== 'US') return;
 		//if(data.lang !== 'en') return;
